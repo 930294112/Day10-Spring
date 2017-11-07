@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--Spring容器中的对象配置,一个bean代表了一个对象
+    Spring容器负责对象的创建,初始化,销毁等工作,这个动作叫做IOC(控制反转)
+    id:唯一标示这个对象的国名称,用于个getBean方法传入参数
+    class:类的全路径
+    scope:配置当前bean的创建模式,是单列的还是每次都重新创建
+        singleton:默认的,单列模式,该bean在容器加载时创建,不管多少次调用,整个应用程序只有一个对象
+        prototype:该bean的创建时机在getBean方法的调用处,如果没有调用getBean方法获得此bean对象,则该对象不会被创建,
+        每次调用getBean方法就会创建该bean的实例,此时Spring容器不负责管理该bean的生命周期,只负责创建,创建完就不管了,通常在进行action对象的配置中配置该属性
+        -->
+    <bean id="helloWord"
+          class="com.lanou.domain.HelloWord"
+          scope="prototype"
+          lazy-init="false"/>
+
+    <!--静态方法工厂模式的对象配置
+    1class为工厂对象
+    2factory-method:指向工厂中获取某个对象的静态当方法
+    3该bean返回的是具体的bean对象,例如HelloWord对象-->
+    <bean id="helloWordFactory"
+          class="com.lanou.domain.HelloWordFactory"
+          factory-method="getInstance"/>
+
+    <!--实例实例工厂获得HelloWord
+    class;实例工厂全路径-->
+    <bean id="helloWordFactory2"
+          class="com.lanou.domain.HelloWordFactory2"/>
+
+    <!--通过实例工厂对象 的引入获取某个bean对象
+    factory-bean:指向实例工厂类配置的id引用,必须在该bean之前定义实例工厂bean
+    class:指明当前的id返回的类型(可选项)
+    factory-method:指明实例工厂类中的创建方法-->
+    <bean id="helloWord2"
+          class="com.lanou.domain.HelloWord"
+          factory-bean="helloWordFactory2"
+          factory-method="getInstance"/>
+
+    <!--lazy-init
+        第一次创建对象的时机
+        false:默认情况,在Spring容器加载时创建对象(推荐)
+        true:当第一次调用getBean方法时创建
+        init-method:对象初始化的方法,在构造方法执行之后调用
+        destroy-method:对象销毁时会调用的方法,在Spring容器关闭时-->
+    <bean id="person"
+          class="com.lanou.domain.Person"
+          lazy-init="false"
+          init-method="init"
+    destroy-method="destroy"/>
+
+    <!--依赖注入DI-->
+    <bean id="person2" class="com.lanou.domain.Person"/>
+    <bean id="student"
+          class="com.lanou.domain.Student">
+        <!--构造注入:通过构造方法的方式去给他的属性赋值-->
+
+        <!--根据构造方法中的参数名称进行匹配赋值(推荐)-->
+        <constructor-arg name="name" value="依依"/>
+        <!--根据构造方法中的参数索引进行匹配,下标从0开始-->
+        <constructor-arg index="1" value="男"/>
+        <!--根据构造方法中的参数类型进行匹配赋值-->
+        <constructor-arg type="int" value="22"/>
+        <!--通过调用bean对象中某个属性的setXXX方法给属性赋值-->
+        <property name="id" value="001"/>
+        <!--调用bean对象中的setXXX方法给引入其他对象的属性赋值-->
+        <property name="person" ref="person2"/>
+
+    </bean>
+
+</beans>
